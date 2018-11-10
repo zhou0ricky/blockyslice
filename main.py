@@ -57,6 +57,18 @@ def invertPoints(points, position, rotation):
 		newPoints.append([rx, ry])
 	return newPoints
 
+def calculateArea(points):
+		pointsList = points + [points[0]]
+		num1 = 0
+		num2 = 0
+		for i in range(len(points)):
+			x1 = pointsList[i][0]
+			y1 = pointsList[i+1][1]
+			num1 += x1*y1
+			y2 = pointsList[i][1]
+			x2 = pointsList[i+1][0]
+			num2 += x2*y2
+		return abs(num1 - num2) / 2
 
 class Polygon(object):
 	def __init__(self, points, position, velocity, rotation, rotationRate, color):
@@ -100,32 +112,21 @@ class Polygon(object):
 				half2.append(self.points[i % len(self.points)])
 			half1.append(intersectionPoints[1])
 			half2.append(intersectionPoints[0])
-			self.points = half1
 			vel2 = copy.copy(self.velocity)
-			self.velocity[0] += 0.5
-			vel2[0] -= 0.5
-			smaller = Polygon(half2, copy.copy(self.position), vel2, self.rotation, self.rotationRate, (100, 100, 100))
-			polygons.append(smaller)
-
+			#self.velocity[0] += 0.5
+			#vel2[0] -= 0.5
+			if calculateArea(half1) > calculateArea(half2):
+				self.points = half1
+				polygons.append(Polygon(half2, copy.copy(self.position), vel2, self.rotation, self.rotationRate, (100, 100, 100)))
+			else:
+				self.points = half2
+				polygons.append(Polygon(half1, copy.copy(self.position), vel2, self.rotation, self.rotationRate, (100, 100, 100)))
 
 	def move(self, time):
 		self.position[0] += self.velocity[0] * time
 		self.position[1] += self.velocity[1] * time
 		self.velocity[1] += gravity * time
 		self.rotation += self.rotationRate * time
-	
-	def calculateArea(self):
-		pointsList = self.points + [self.points[0]]
-		num1 = 0
-		num2 = 0
-		for i in range(len(self.points)):
-			x1 = pointsList[i][0]
-			y1 = pointsList[i+1][1]
-			num1 += x1*y1
-			y2 = pointsList[i][1]
-			x2 = pointsList[i+1][0]
-			num2 += x2*y2
-		return math.abs(num1 - num2) / 2
 
 def createPolygon(screenSize):
 	points = [
