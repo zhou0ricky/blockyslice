@@ -59,12 +59,13 @@ def invertPoints(points, position, rotation):
 
 
 class Polygon(object):
-	def __init__(self, points, position, velocity, rotation, rotationRate):
+	def __init__(self, points, position, velocity, rotation, rotationRate, color):
 		self.points = points
 		self.position = position
 		self.velocity = velocity
 		self.rotation = rotation
 		self.rotationRate = rotationRate
+		self.color = color
 
 	def recenter(self):
 		center = [0, 0]
@@ -93,15 +94,17 @@ class Polygon(object):
 			intersectionPoints = invertPoints(intersectionPoints, self.position, self.rotation)
 			half1 = [intersectionPoints[0]]
 			half2 = [intersectionPoints[1]]
-			for i in range(0, len(newPoints)):
-				if intersectionEdgeNums[0] < i and i <= intersectionEdgeNums[1]:
-					half1.append(self.points[i])
-				else:
-					half2.append(self.points[i])
+			for i in range(intersectionEdgeNums[0] + 1, intersectionEdgeNums[1] + 1):
+				half1.append(self.points[i])
+			for i in range(intersectionEdgeNums[1] + 1, len(self.points) + intersectionEdgeNums[0] + 1):
+				half2.append(self.points[i % len(self.points)])
 			half1.append(intersectionPoints[1])
 			half2.append(intersectionPoints[0])
 			self.points = half1
-			smaller = Polygon(half2, copy.copy(self.position), copy.copy(self.velocity), self.rotation, self.rotationRate)
+			vel2 = copy.copy(self.velocity)
+			self.velocity[0] += 0.5
+			vel2[0] -= 0.5
+			smaller = Polygon(half2, copy.copy(self.position), vel2, self.rotation, self.rotationRate, (100, 100, 100))
 			polygons.append(smaller)
 
 
@@ -127,7 +130,7 @@ def createPolygon(screenSize):
 	velocity = [velX, velY]
 	rotation = 0.05
 	rotationRate = random.randint(-10, 10) / 50
-	return Polygon(points, position, velocity, rotation, rotationRate)
+	return Polygon(points, position, velocity, rotation, rotationRate, (0, 0, 0))
 
 def main():
 	pygame.init()
@@ -168,7 +171,7 @@ def main():
 		screen.fill([255, 255, 255])
 		
 		for poly in polygons:
-			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), [0, 0, 0])
+			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
 			poly.move(time)
 
 		if cutting:
