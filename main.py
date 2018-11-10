@@ -471,7 +471,7 @@ while(running):
 			createParticle(polygons, [random.randint(int(screenSize[0] / 80), int(screenSize[0] / 20)), focusBarInnerHeight], (150, 150, 215))
 		else:
 			time = (1 + time) / 2
-
+			
 		if polygon.position[1] > screenSize[1] * 1.25:
 			angles1 = findAngles(poly.points)
 			angles2 = findAngles(target.points)
