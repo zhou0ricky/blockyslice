@@ -230,11 +230,7 @@ font = pygame.font.Font("eggroll.ttf", 64)
 pygame.display.set_caption("Blocky Slice")
 
 running = True
-<<<<<<< HEAD
-mode = 0
-=======
 mode = 1
->>>>>>> bc7c9df9c429e33320ef87958af304140aecc6ac
 
 time = 1
 
@@ -347,14 +343,13 @@ while(running):
 	#Choose Gamemode
 	####################################################################################################
 	elif mode == 1:
-<<<<<<< HEAD
 		if not pygame.mixer.get_busy():
 			music.play(splashIntro)	
 			music.queue(splashLoop)
 		if music.get_sound() == splashLoop:
 			music.queue(splashLoop)
 		choose()
-=======
+
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				running = False
@@ -389,8 +384,6 @@ while(running):
 
 		if cutting:
 			pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], secondCut[0], secondCut[1], [155, 0 ,0])
-
->>>>>>> bc7c9df9c429e33320ef87958af304140aecc6ac
 
 	####################################################################################################
 	#Buffer Mode
@@ -502,7 +495,6 @@ while(running):
 	#Survival Mode
 	####################################################################################################
 	elif mode == 3:
-<<<<<<< HEAD
 		if not pygame.mixer.get_busy():
 			music.play(survivalIntro)
 			music.queue(survivalTheme)
@@ -514,10 +506,7 @@ while(running):
 	####################################################################################################
 	elif mode == 4:
 		pass
-=======
-		survival()
 	pygame.display.flip()
->>>>>>> bc7c9df9c429e33320ef87958af304140aecc6ac
 
 print(clock.get_fps())
 pygame.quit()
