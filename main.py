@@ -3,6 +3,7 @@ import math
 import random
 import copy
 
+
 gravity = 0.1
 
 def intersect(line1, line2):
