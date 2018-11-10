@@ -174,6 +174,44 @@ def createPolygon(screenSize):
 	rotationRate = random.randint(-10, 10) / 50
 	return Polygon(points, position, velocity, rotation, rotationRate, (215, 0, 0))
 
+
+import numpy as np
+
+# outputs list of angles based on points given
+def findAngles(points):
+	angleList = []
+	for index in range(len(points)):
+		a = np.array(points[index - 1])
+		b = np.array(points[index])
+		c = np.array(points[index + 1])
+
+		ba = a - b
+		bc = c - b
+		
+		cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+		angle = np.arccos(cosine_angle)
+		angleList.append(angle)
+
+	return angleList
+
+# compares 2 list of angles and scores based on differences
+def comparison(angleList1, angleList2):
+	if len(angleList1) > len(angleList2):
+		(big, small) = (angleList1, angleList2)
+	else:
+		(big, small) = (angleList2, angleList1)
+	scoreList = []
+
+	for i in range(len(big)):
+		sum = 0
+		for j in range(len(small)):
+			sum += abs(small[j] - big[j])
+		scoreList.append(sum)
+		big.insert(0, big.pop())
+	return min(scoreList)
+
+
+
 def createParticle(polygons, position, color):
 	points = [
 		[-3, -3], [-3, 3],
@@ -220,6 +258,7 @@ targetText = font.render("Target: ", True, (75, 75, 75))
 targetTextRect = targetText.get_rect().move(750, 30)
 target = createTarget(screenSize)
 
+<<<<<<< HEAD
 buttonBox = [-150, 50], [-150, -50], [150, -50], [150, 50]
 creativeBox = Polygon(buttonBox, [240, 300], [0, 0], 0, 0.3, (215, 0, 0))
 creativeBoxText = font.render("Creative", True, (75, 75, 75))
@@ -227,12 +266,23 @@ creativeBoxTextRect = creativeBoxText.get_rect().move(100, 265)
 polygons.append(creativeBox)
 
 #sound
+=======
+#Import sounds
+>>>>>>> e97ad0b4d51e40f0ec2dde594ccfc2090f7fd50c
 gameSong = pygame.mixer.Sound("Speed Round Loop.wav")
 slashUp = pygame.mixer.Sound("UpSlash.wav")
 slashDown = pygame.mixer.Sound("Short Down Slash.wav")
+tutorialMusic = pygame.mixer.Sound("Creative-Tutorial.wav")
+senseiTalking = pygame.mixer.Sound("senseiTalking.wav")
+survivalIntro = pygame.mixer.Sound("Speed Round Intro.wav")
+survivalTheme = pygame.mixer.Sound("Speed Round Loop.wav")
+splashIntro = pygame.mixer.Sound("Splash Music Intro.wav")
+splashLoop = pygame.mixer.Sound("Splash Music LOOP.wav")
+creativeTheme = pygame.mixer.Sound("Tutorial.wav")
 
+# class Music(object):
+music = pygame.mixer.Channel(0)
 
-gameSong.play(-1)
 
 while(running):
 	clock.tick(60)
@@ -241,6 +291,9 @@ while(running):
 	#Splash Screen
 	####################################################################################################
 	if mode == 0:
+		if not pygame.mixer.get_busy:
+			music.play(splashIntro)	
+			music.queue(splashLoop)
 		splash()
 
 	####################################################################################################
@@ -287,6 +340,15 @@ while(running):
 	#Buffer Mode
 	####################################################################################################
 	elif mode == 2:
+		if not pygame.mixer.get_busy():
+			music.play(survivalIntro)
+			music.queue(survivalTheme)
+		if music.get_sound() == survivalTheme:
+			music.queue(survivalTheme)
+
+
+			# pygame.mixer.music.queue(survivalTheme)
+
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				running = False
