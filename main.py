@@ -268,7 +268,6 @@ running = True
 mode = 0
 nextMode = 0
 
-
 time = 1
 
 polygon = createPolygon(screenSize)
@@ -296,6 +295,20 @@ focusBarInnerRect = [[screenSize[0] / 80, screenSize[1] / 12],
 targetText = font.render("Target: ", True, (75, 75, 75))
 targetTextRect = targetText.get_rect().move(750, 30)
 target = createTarget(screenSize)
+
+ratings = []
+perfect = font.render("Perfect!", True, (150, 150, 215))
+ratings.append((perfect, perfect.get_rect()))
+great = font.render("Great", True, (150, 150, 215))
+ratings.append((great, great.get_rect()))
+alright = font.render("Alright", True, (150, 150, 215))
+ratings.append((alright, alright.get_rect()))
+bad = font.render("Bad", True, (150, 150, 215))
+ratings.append((bad, bad.get_rect()))
+abysmal = font.render("Abysmal!", True, (150, 150, 215))
+ratings.append((abysmal, abysmal.get_rect()))
+rating = (ratings[0], [0, screenSize[1]], 0)
+
 
 buttonBox = [-150, 50], [-150, -50], [150, -50], [150, 50]
 creativeBox = Polygon(buttonBox, [150, 300], [0, 0], 0, 0.3, (215, 0, 0))
@@ -410,16 +423,17 @@ while(running):
 			particlePos += 25
 			if particlePos > 50: particlePos = -1
 
-		if len(polygons) == 0:
-			mode = nextMode
-			polygons.append(polygon)
-
 		for i in range(len(polygons) - 1, -1, -1):
 			poly = polygons[i]
 			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
 			poly.move(time)
 			if poly.position[1] > screenSize[1] * 1.25:
 				polygons.pop(i)
+
+		if len(polygons) == 0:
+			mode = nextMode
+			polygon = createPolygon(screenSize)
+			polygons.append(polygon)
 
 
 	####################################################################################################
@@ -473,7 +487,6 @@ while(running):
 			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
 			poly.move(time)
 			if poly.position[1] > screenSize[1] * 1.25:
-				
 				polygons.pop(i)
 
 		if cutting:
@@ -485,22 +498,35 @@ while(running):
 			time = (1 + time) / 2
 
 		if polygon.position[1] > screenSize[1] * 1.25:
-
 			angles1 = findAngles(poly.points)
 			angles2 = findAngles(target.points)
 			length1 = findLengths(poly.points)
 			length2 = findLengths(target.points)
 			score = (comparison(angles1, angles2, length1, length2))
+			rat = 4
 			if score < 30:
+				rat = 0
+				focus += 0.4
+			elif score < 35:
+				rat = 1
 				focus += 0.3
 			elif score < 40:
+				rat = 2
+				focus += 0.1
+			elif score < 45:
+				rat = 3
 				focus += 0
 			else:
 				focus -= 0.1
+			rating = [ratings[rat], [400, screenSize[1]], -6]
 			polygon = createPolygon(screenSize)
 			polygons = [polygon] + polygons
 			target = createTarget(screenSize)
 
+		if rating[1][1] < screenSize[1] or rating[2] < 0:
+			rating[1][1] += rating[2]
+			rating[2] += gravity
+			screen.blit(rating[0][0], rating[0][1].move(rating[1][0], rating[1][1]))
 
 		screen.blit(targetText, targetTextRect)
 		pygame.gfxdraw.filled_polygon(screen, transformPoints(target.points, target.position, target.rotation), target.color)
@@ -515,10 +541,6 @@ while(running):
 		if music.get_sound() == survivalTheme:
 			music.queue(survivalTheme)
 
-
-		newPolyCount = random.randint(1, 4)
-		polyList = createMultiplePolygon(screenSize, newPolyCount)
-
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				running = False
@@ -530,8 +552,7 @@ while(running):
 				cutting = True
 			elif event.type == pygame.MOUSEBUTTONUP:
 				cutting = False
-				for polygon in polyList:
-					polygon.slice([firstCut, secondCut], polygons)
+				polygon.slice([firstCut, secondCut], polygons)
 				particlePos = 0
 				if secondCut[1] > firstCut[1]:
 					slashDown.play()
@@ -556,14 +577,12 @@ while(running):
 			particlePos += 25
 			if particlePos > 50: particlePos = -1
 
-		for polygon in polyList:
-			for i in range(len(polygons) - 1, -1, -1):
-				poly = polygons[i]
-				pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
-				poly.move(time)
-				if poly.position[1] > screenSize[1] * 1.25:
-
-					polygons.pop(i)
+		for i in range(len(polygons) - 1, -1, -1):
+			poly = polygons[i]
+			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
+			poly.move(time)
+			if poly.position[1] > screenSize[1] * 1.25:
+				polygons.pop(i)
 
 		if cutting:
 			pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], secondCut[0], secondCut[1], [155, 0 ,0])
@@ -573,23 +592,12 @@ while(running):
 		else:
 			time = (1 + time) / 2
 
-
-		if polygon.position[1] > screenSize[1]:
-			angles1 = findAngles(poly.points)
-			angles2 = findAngles(target.points)
-			length1 = findLengths(poly.points)
-			length2 = findLengths(target.points)
-			print((comparison(angles1, angles2, length1, length2)))
-
 		if polygon.position[1] > screenSize[1] * 1.25:
-
+			size = calculateArea(polygon.points)
+			focus += (5000 - size) * 0.00005
+			print(focus)
 			polygon = createPolygon(screenSize)
 			polygons = [polygon] + polygons
-			focus = 0.5
-			target = createTarget(screenSize)
-
-		screen.blit(targetText, targetTextRect)
-		pygame.gfxdraw.filled_polygon(screen, transformPoints(target.points, target.position, target.rotation), target.color)
 
 	pygame.display.flip()
 
