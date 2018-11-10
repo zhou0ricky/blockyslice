@@ -110,6 +110,19 @@ class Polygon(object):
 		self.position[1] += self.velocity[1] * time
 		self.velocity[1] += gravity * time
 		self.rotation += self.rotationRate * time
+		
+	def calculateArea(self):
+		pointsList = self.points + [self.points[0]]
+		num1 = 0
+		num2 = 0
+		for i in range(len(self.points)):
+			x1 = pointsList[i][0]
+			y1 = pointsList[i+1][1]
+			num1 += x1*y1
+			y2 = pointsList[i][1]
+			x2 = pointsList[i+1][0]
+			num2 += x2*y2
+		return math.abs(num1 - num2) / 2
 
 def createPolygon(screenSize):
 	points = [
