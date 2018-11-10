@@ -50,8 +50,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-1386">
-                  <caret line="195" column="19" selection-start-line="195" selection-start-column="19" selection-end-line="195" selection-end-column="19" />
+                <state relative-caret-position="242">
+                  <caret line="539" column="31" lean-forward="true" selection-start-line="539" selection-start-column="31" selection-end-line="539" selection-end-column="31" />
                   <folding>
                     <element signature="e#0#21#0" expanded="true" />
                   </folding>
@@ -66,8 +66,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="438">
-                  <caret line="602" column="29" lean-forward="true" selection-start-line="602" selection-start-column="29" selection-end-line="602" selection-end-column="29" />
+                <state relative-caret-position="-24">
+                  <caret line="560" column="29" selection-start-line="560" selection-start-column="29" selection-end-line="560" selection-end-column="29" />
                   <folding>
                     <element signature="e#0#21#0" expanded="true" />
                   </folding>
@@ -145,7 +145,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/GitHubDesktop/GitHubDesktop.exe" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -209,7 +209,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32907802" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3286334" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -233,8 +233,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="438">
-          <caret line="602" column="29" lean-forward="true" selection-start-line="602" selection-start-column="29" selection-end-line="602" selection-end-column="29" />
+        <state relative-caret-position="242">
+          <caret line="539" column="31" lean-forward="true" selection-start-line="539" selection-start-column="31" selection-end-line="539" selection-end-column="31" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
