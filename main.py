@@ -184,43 +184,66 @@ def createParticle(polygons, position, color):
 	velocity = [random.randint(-10, 10) / 5, random.randint(-10, 10) / 5]
 	polygons.append(Polygon(points, position, velocity, 0, 0.1, color))
 
-def main():
-	pygame.init()
-	screenSize = [1080, 760]
+pygame.init()
+screenSize = [1080, 760]
 
-	screen = pygame.display.set_mode(screenSize)
-	clock = pygame.time.Clock()
-	font = pygame.font.Font("eggroll.ttf", 64)
+screen = pygame.display.set_mode(screenSize)
+clock = pygame.time.Clock()
+font = pygame.font.Font("eggroll.ttf", 64)
 
-	pygame.display.set_caption("Blocky Slice")
+pygame.display.set_caption("Blocky Slice")
 
-	running = True
+running = True
+mode = 2
 
-	time = 1
+time = 1
 
-	polygon = createPolygon(screenSize)
-	polygons = [polygon]
+polygon = createPolygon(screenSize)
+polygons = [polygon]
 
-	focus = 0.5
+focus = 0.5
 
-	cutting = False
-	firstCut = []
-	secondCut = []
+cutting = False
+firstCut = []
+secondCut = []
 
-	background = pygame.image.load("background.png")
-	focusBarOuterRect = [(0, screenSize[1] / 16),
-					(screenSize[0] / 16, screenSize[1] / 16), 
-					(screenSize[0] / 16, screenSize[1] - screenSize[1] / 16),
-					(0, screenSize[1] - screenSize[1] / 16)]
-	focusBarInnerRect = [[screenSize[0] / 80, screenSize[1] / 12],
-					[screenSize[0] / 20, screenSize[1] / 12], 
-					[screenSize[0] / 20, screenSize[1] - screenSize[1] / 12],
-					[screenSize[0] / 80, screenSize[1] - screenSize[1] / 12]]
-	targetText = font.render("Target: ", True, (75, 75, 75))
-	targetTextRect = targetText.get_rect().move(750, 30)
-	target = createTarget(screenSize)
+background = pygame.image.load("background.png")
+focusBarOuterRect = [(0, screenSize[1] / 16),
+				(screenSize[0] / 16, screenSize[1] / 16), 
+				(screenSize[0] / 16, screenSize[1] - screenSize[1] / 16),
+				(0, screenSize[1] - screenSize[1] / 16)]
+focusBarInnerRect = [[screenSize[0] / 80, screenSize[1] / 12],
+				[screenSize[0] / 20, screenSize[1] / 12], 
+				[screenSize[0] / 20, screenSize[1] - screenSize[1] / 12],
+				[screenSize[0] / 80, screenSize[1] - screenSize[1] / 12]]
+targetText = font.render("Target: ", True, (75, 75, 75))
+targetTextRect = targetText.get_rect().move(750, 30)
+target = createTarget(screenSize)
 
-	while(running):
+gameSong = pygame.mixer.Sound("Speed Round Loop.wav")
+slashUp = pygame.mixer.Sound("UpSlash.wav")
+slashDown = pygame.mixer.Sound("Short Down Slash.wav")
+
+
+gameSong.play(-1)
+
+while(running):
+	####################################################################################################
+	#Splash Screen
+	####################################################################################################
+	if mode == 0:
+		splash()
+
+	####################################################################################################
+	#Choose Gamemode
+	####################################################################################################
+	elif mode == 1:
+		choose()
+
+	####################################################################################################
+	#Creative Mode
+	####################################################################################################
+	elif mode == 2:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				running = False
@@ -233,12 +256,17 @@ def main():
 			elif event.type == pygame.MOUSEBUTTONUP:
 				cutting = False
 				polygon.slice([firstCut, secondCut], polygons);
+				if secondCut[1] > firstCut[1]:
+					slashDown.play()
+				else:
+					slashUp.play()
 		secondCut = pygame.mouse.get_pos()
 
 		clock.tick(60)
 		screen.blit(background, [0, 0, screenSize[0], screenSize[1]])
 		
-		focusBarInnerHeight = focus * (screenSize[1] / 12) + (1 - focus) * (screenSize[1] - screenSize[1] / 12)
+		focusBarTargetInnerHeight = focus * (screenSize[1] / 12) + (1 - focus) * (screenSize[1] - screenSize[1] / 12)
+		focusBarInnerHeight = (focusBarTargetInnerHeight + focusBarInnerRect[0][1]) / 2
 		focusBarInnerRect[0][1] = focusBarInnerHeight
 		focusBarInnerRect[1][1] = focusBarInnerHeight
 		pygame.gfxdraw.filled_polygon(screen, focusBarOuterRect, (0, 0, 0, 155))
@@ -271,7 +299,11 @@ def main():
 
 		pygame.display.flip()
 
-	print(clock.get_fps())
-	pygame.quit()
+	####################################################################################################
+	#Survival Mode
+	####################################################################################################
+	elif mode == 3:
+		survival()
 
-main()
+print(clock.get_fps())
+pygame.quit()
