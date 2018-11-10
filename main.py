@@ -5,6 +5,29 @@ import copy
 
 
 gravity = 0.1
+triangle = [
+	[-50, 50], [0, -35], [50, 50]
+]
+rectangle = [
+	[-25, 50], [-25, -50], [25, -50], [25, 50]
+]
+rightTriangle = [
+	[-50, 50], [-50, -50], [50, 50]
+]
+hexagon = [
+	[-50, 0], [-30, -50], [30, -50], [50, 0], [30, 50], [-30, 50]
+]
+shape1 = [
+	[-50, 50], [-50, -50], [0, -50], [50, 50]
+]
+shape2 = [
+	[-50, -50], [-25, -50], [50, 25], [50, 50], [25, 50], [-50, -25]
+]
+shape3 = [
+	[-50, 50], [-50, 0], [0, -50], [50, -50], [50, 50]
+]
+
+shapes = [triangle, rectangle, rightTriangle, hexagon, shape1, shape2, shape3]
 
 def intersect(line1, line2):
 	xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
@@ -90,8 +113,6 @@ class Polygon(object):
 		for point in self.points:
 			point[0] -= center[0]
 			point[1] -= center[1]
-		self.position[0] -= center[0]
-		self.position[1] -= center[1]
 
 	def slice(self, line, polygons):
 		newPoints = transformPoints(self.points, self.position, self.rotation)
@@ -120,6 +141,7 @@ class Polygon(object):
 			else:
 				self.points = half2
 				polygons.append(Polygon(half1, copy.copy(self.position), velocity, self.rotation, self.rotationRate, (155, 100, 100)))
+			self.recenter()
 		for i in range(50):
 			posX = line[0][0] * (50 - i) / 50 + line[1][0] * i / 50
 			posY = line[0][1] * (50 - i) / 50 + line[1][1] * i / 50
@@ -130,6 +152,11 @@ class Polygon(object):
 		self.position[1] += self.velocity[1] * time
 		self.velocity[1] += gravity * time
 		self.rotation += self.rotationRate * time
+
+def createTarget(screenSize):
+	points = shapes[random.randint(0, len(shapes) - 1)]
+	position = [screenSize[0] - 70, 55]
+	return Polygon(points, position, [0, 0], 0, 0, (215, 0, 0))
 
 def createPolygon(screenSize):
 	points = [
@@ -163,6 +190,7 @@ def main():
 
 	screen = pygame.display.set_mode(screenSize)
 	clock = pygame.time.Clock()
+	font = pygame.font.Font("eggroll.ttf", 64)
 
 	pygame.display.set_caption("Blocky Slice")
 
@@ -188,6 +216,9 @@ def main():
 					[screenSize[0] / 20, screenSize[1] / 12], 
 					[screenSize[0] / 20, screenSize[1] - screenSize[1] / 12],
 					[screenSize[0] / 80, screenSize[1] - screenSize[1] / 12]]
+	targetText = font.render("Target: ", True, (75, 75, 75))
+	targetTextRect = targetText.get_rect().move(750, 30)
+	target = createTarget(screenSize)
 
 	while(running):
 		for event in pygame.event.get():
@@ -217,6 +248,8 @@ def main():
 			poly = polygons[i]
 			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
 			poly.move(time)
+			if poly.position[1] > screenSize[1] * 1.25:
+				polygons.pop(i)
 
 		if cutting:
 			pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], 
@@ -229,11 +262,16 @@ def main():
 
 		if polygon.position[1] > screenSize[1]:
 			polygon = createPolygon(screenSize)
-			polygons = [polygon]
-			focus = 1
+			polygons = [polygon] + polygons
+			focus = 0.5
+			target = createTarget(screenSize)
+
+		screen.blit(targetText, targetTextRect)
+		pygame.gfxdraw.filled_polygon(screen, transformPoints(target.points, target.position, target.rotation), target.color)
 
 		pygame.display.flip()
 
+	print(clock.get_fps())
 	pygame.quit()
 
 main()
