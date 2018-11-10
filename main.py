@@ -230,7 +230,7 @@ font = pygame.font.Font("eggroll.ttf", 64)
 pygame.display.set_caption("Blocky Slice")
 
 running = True
-mode = 1
+mode = 0
 
 time = 1
 
@@ -307,7 +307,13 @@ while(running):
 				cutting = True
 			elif event.type == pygame.MOUSEBUTTONUP:
 				cutting = False
-				polygon.slice([firstCut, secondCut], polygons);
+				if creativeBox.slice([firstCut, secondCut], polygons):
+					creativeBox.rotationRate = -0.3
+					for poly in polygons:
+						poly.velocity = [-25, -0.4]
+					creativeBox.velocity = [25, -0.4]
+					mode = 2
+				particlePos = 0
 				if secondCut[1] > firstCut[1]:
 					slashDown.play()
 				else:
