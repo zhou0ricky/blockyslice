@@ -258,7 +258,7 @@ def main():
 	pygame.init()
 	screenSize = [1080, 760]
 
-	screen = pygame.display.set_mode(screenSize)
+	screen = pygame.display.set_mode(screenSize, pygame.FULLSCREEN)
 	clock = pygame.time.Clock()
 	font = pygame.font.Font("eggroll.ttf", 64)
 	pygame.display.set_caption("Blocky Slice")
@@ -285,12 +285,13 @@ def main():
 	go = pygame.image.load("GO!.png")
 	splashTitle = pygame.image.load("Splash title (Textcraft).png")
 	sensei = pygame.image.load("Sensei.png")
-	senseiTimer = 0
+	senseiTimer = -1
 	senseiIntro1 = pygame.image.load("senseiIntro1.png")
 	senseiIntro2 = pygame.image.load("senseiIntro2.png")
 	senseiIntro3 = pygame.image.load("senseiIntro3.png")
+	senseiIntro = senseiIntro1
 	senseiY = 520
-	senseiTalkLocation = [400, 400, screenSize[0], screenSize[1]]
+	senseiTalkLocation = [730, 500, screenSize[0], screenSize[1]]
 	focusBarOuterRect = [(0, screenSize[1] / 16),
 					(screenSize[0] / 16, screenSize[1] / 16), 
 					(screenSize[0] / 16, screenSize[1] - screenSize[1] / 16),
@@ -393,9 +394,23 @@ def main():
 			screen.blit(splashTitle, [200, 50, screenSize[0], screenSize[1]])
 
 			screen.blit(sensei, [850, senseiY, screenSize[0], screenSize[1]])
-			senseiY = 540 + math.sin(senseiTimer / 25) * 25
-			senseiTimer += 1
-			screen.blit(senseiIntro1, senseiTalkLocation)
+			senseiY = 540 + math.sin(senseiTimer / 90 * 3.14159) * 25
+			senseiTimer = (senseiTimer + 1) % 720
+
+			if senseiIntro != None:
+				screen.blit(senseiIntro, [senseiTalkLocation[0], senseiY - 60])
+
+			if senseiTimer == 0:
+				senseiIntro = senseiIntro1
+				senseiTalking.play()
+			elif senseiTimer == 180:
+				senseiIntro = senseiIntro2
+				senseiTalking.play()
+			elif senseiTimer == 360:
+				senseiIntro = senseiIntro2
+				senseiTalking.play()
+			elif senseiTimer == 120 or senseiTimer == 300 or senseiTimer == 480:
+				senseiIntro = None
 
 			if cutting:
 				pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], secondCut[0], secondCut[1], [155, 0 ,0])
