@@ -2,7 +2,6 @@ import pygame.gfxdraw
 import math
 import random
 
-
 gravity = 0.1
 
 class Polygon(object):
@@ -35,11 +34,11 @@ class Polygon(object):
 							ny + self.position[1]])
 		return newPoints
 
-	def move(self):
-		self.position[0] += self.velocity[0]
-		self.position[1] += self.velocity[1]
-		self.velocity[1] += gravity
-		self.rotation += 0.1
+	def move(self, time):
+		self.position[0] += self.velocity[0] * time
+		self.position[1] += self.velocity[1] * time
+		self.velocity[1] += gravity * time
+		self.rotation += 0.1 * time
 
 def main():
 	pygame.init()
@@ -52,7 +51,13 @@ def main():
 
 	running = True
 
+	time = 1
+
 	polygon = Polygon(screenSize)
+
+	cutting = False
+	firstCut = []
+	secondCut = []
 
 	while(running):
 		for event in pygame.event.get():
@@ -61,13 +66,27 @@ def main():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
 					running = False
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				firstCut = pygame.mouse.get_pos()
+				cutting = True
+			elif event.type == pygame.MOUSEBUTTONUP:
+				cutting = False
+		secondCut = pygame.mouse.get_pos()
 
 		clock.tick(60)
 		screen.fill([255, 255, 255])
 
 		pygame.gfxdraw.filled_polygon(screen, polygon.transformPoints(), [0, 0, 0])
+		
+		if cutting:
+			pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], 
+								secondCut[0], secondCut[1], [0, 0 ,0])
+			time = (0.1 * 4 + time) / 5
+		else:
+			time = (4 + time) / 5
 
-		polygon.move()
+
+		polygon.move(time)
 
 		if polygon.position[1] > screenSize[1]:
 			polygon = Polygon(screenSize)
