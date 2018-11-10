@@ -258,10 +258,9 @@ def main():
 	pygame.init()
 	screenSize = [1080, 760]
 
-	screen = pygame.display.set_mode(screenSize, pygame.FULLSCREEN)
+	screen = pygame.display.set_mode(screenSize)
 	clock = pygame.time.Clock()
 	font = pygame.font.Font("eggroll.ttf", 64)
-
 	pygame.display.set_caption("Blocky Slice")
 
 	running = True
@@ -285,6 +284,13 @@ def main():
 	background = pygame.image.load("background.png")
 	go = pygame.image.load("GO!.png")
 	splashTitle = pygame.image.load("Splash title (Textcraft).png")
+	sensei = pygame.image.load("Sensei.png")
+	senseiTimer = 0
+	senseiIntro1 = pygame.image.load("senseiIntro1.png")
+	senseiIntro2 = pygame.image.load("senseiIntro2.png")
+	senseiIntro3 = pygame.image.load("senseiIntro3.png")
+	senseiY = 520
+	senseiTalkLocation = [400, 400, screenSize[0], screenSize[1]]
 	focusBarOuterRect = [(0, screenSize[1] / 16),
 					(screenSize[0] / 16, screenSize[1] / 16), 
 					(screenSize[0] / 16, screenSize[1] - screenSize[1] / 16),
@@ -386,14 +392,13 @@ def main():
 			screen.blit(survivalBoxText, survivalBoxTextRect)
 			screen.blit(splashTitle, [200, 50, screenSize[0], screenSize[1]])
 
+			screen.blit(sensei, [850, senseiY, screenSize[0], screenSize[1]])
+			senseiY = 540 + math.sin(senseiTimer / 25) * 25
+			senseiTimer += 1
+			screen.blit(senseiIntro1, senseiTalkLocation)
+
 			if cutting:
 				pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], secondCut[0], secondCut[1], [155, 0 ,0])
-
-		####################################################################################################
-		#Tutorial Mode
-		####################################################################################################
-		elif mode == 1:
-			pass
 
 		####################################################################################################
 		#Buffer Mode
@@ -434,7 +439,6 @@ def main():
 				mode = nextMode
 				polygon = createPolygon(screenSize)
 				polygons.append(polygon)
-
 
 		####################################################################################################
 		#Creative Mode
