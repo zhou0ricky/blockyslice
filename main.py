@@ -177,22 +177,8 @@ def createPolygon(screenSize):
 def createMultiplePolygon(screenSize, n):
 	polyList = []
 	for polygon in range(n):
-		points = [
-			[-50, -50], [-50, 50],
-			[50, 50], [50, -50]
-		]
-
-		posX = random.randint(0, screenSize[0])
-		toTravel = screenSize[0] / 2 - posX
-		posY = screenSize[1]
-		velY = -10
-		velX = toTravel / (-velY / gravity)
-
-		position = [posX, posY]
-		velocity = [velX, velY]
-		rotation = 0.05
-		rotationRate = random.randint(-10, 10) / 50
-		polyList.append(Polygon(points, position, velocity, rotation, rotationRate, (215, 0, 0)))
+		newPoly = createPolygon(screenSize)
+		polyList.append(newPoly)
 	return polyList
 
 import numpy as np
