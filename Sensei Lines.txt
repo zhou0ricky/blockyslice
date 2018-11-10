@@ -1,0 +1,43 @@
+"Welcome to BLOCKYSLICE!!!"
+"My name is Sensei Square, and I'll be teaching you how to be"
+"A SHAPE NINJA MASTER"
+
+"In this game, you will SLICE SEEMLY SHAPES using SAMURAI SWORDS!"
+"Here! Test it out now!"
+
+1) Player misses shape completely: "Um... How about we try that again?"
+2) ELSE: "NICE!"
+
+"Now, you may have noticed that time went a bit slow during your swing."
+"This is because you are using your FOCUS BAR"
+"This special ability hones your senses and will let you see time in SLO-MO!"
+"But be careful!"
+"If you focus runs out, then you will be too tired to SLICE!"
+
+"Now, young grasshopper, there are two ways for you to hone your skills:"
+"CREATIVE MODE and SURVIVAL MODE"
+"In CREATIVE MODE, you will be given a shape to slice into a specific shape,"
+"And you'll be awarded focus depending on how close to the desired shape you SLICE"
+"In SURVIVAL MODE, you will face an onslaught of shapes!"
+"Your goal is to slice the shape into as SMALL a speck as POSSIBLE!"
+"Your focus will continuously recharge, but there's a catch!"
+"If a shape falls to the floor, you'll lose an amount of focus proportional to how big that shape is"
+"So be vigilant for SURPRISES!"
+
+"Now, begin training, we will..."
+
+***FADE TO GAME MODE SELECTION***
+
+***EVERY TEN SHAPES SLICED***
+"EXCELLENT WORK!"
+"WELL DONE"
+"WOAH THERE!"
+"Once, I got on the 28X to go to Squirrel Hill. Whoops, RHOMBUS!"
+"Let me tell you about the time I sparred with Sir Cumference..."
+
+***GAME OVER***
+"We'll get 'em next time..."
+"Hey, there's no need to get bent out of shape..."
+"What an unshapely outcome..."
+
+
