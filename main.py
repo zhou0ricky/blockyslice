@@ -220,18 +220,30 @@ targetText = font.render("Target: ", True, (75, 75, 75))
 targetTextRect = targetText.get_rect().move(750, 30)
 target = createTarget(screenSize)
 
+#Import sounds
 gameSong = pygame.mixer.Sound("Speed Round Loop.wav")
 slashUp = pygame.mixer.Sound("UpSlash.wav")
 slashDown = pygame.mixer.Sound("Short Down Slash.wav")
+tutorialMusic = pygame.mixer.Sound("Creative-Tutorial.wav")
+senseiTalking = pygame.mixer.Sound("senseiTalking.wav")
+survivalIntro = pygame.mixer.Sound("Speed Round Intro.wav")
+survivalTheme = pygame.mixer.Sound("Speed Round Loop.wav")
+splashIntro = pygame.mixer.Sound("Splash Music Intro.wav")
+splashLoop = pygame.mixer.Sound("Splash Music LOOP.wav")
+creativeTheme = pygame.mixer.Sound("Tutorial.wav")
 
+# class Music(object):
+music = pygame.mixer.Channel(0)
 
-gameSong.play(-1)
 
 while(running):
 	####################################################################################################
 	#Splash Screen
 	####################################################################################################
 	if mode == 0:
+		if not pygame.mixer.get_busy:
+			music.play(splashIntro)	
+			music.queue(splashLoop)
 		splash()
 
 	####################################################################################################
@@ -244,6 +256,15 @@ while(running):
 	#Creative Mode
 	####################################################################################################
 	elif mode == 2:
+		if not pygame.mixer.get_busy():
+			music.play(survivalIntro)
+			music.queue(survivalTheme)
+		if music.get_sound() == survivalTheme:
+			music.queue(survivalTheme)
+
+
+			# pygame.mixer.music.queue(survivalTheme)
+
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				running = False
