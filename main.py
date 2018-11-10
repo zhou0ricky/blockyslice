@@ -116,14 +116,14 @@ class Polygon(object):
 			velocity = [random.randint(-10, 10) / 0.25, random.randint(-10, 10) / 0.25]
 			if calculateArea(half1) > calculateArea(half2):
 				self.points = half1
-				polygons.append(Polygon(half2, copy.copy(self.position), velocity, self.rotation, self.rotationRate, (100, 100, 100)))
+				polygons.append(Polygon(half2, copy.copy(self.position), velocity, self.rotation, self.rotationRate, (155, 100, 100)))
 			else:
 				self.points = half2
-				polygons.append(Polygon(half1, copy.copy(self.position), velocity, self.rotation, self.rotationRate, (100, 100, 100)))
+				polygons.append(Polygon(half1, copy.copy(self.position), velocity, self.rotation, self.rotationRate, (155, 100, 100)))
 		for i in range(50):
 			posX = line[0][0] * (50 - i) / 50 + line[1][0] * i / 50
 			posY = line[0][1] * (50 - i) / 50 + line[1][1] * i / 50
-			createParticle(polygons, [posX, posY])
+			createParticle(polygons, [posX, posY], (155, 100, 100))
 
 	def move(self, time):
 		self.position[0] += self.velocity[0] * time
@@ -147,15 +147,15 @@ def createPolygon(screenSize):
 	velocity = [velX, velY]
 	rotation = 0.05
 	rotationRate = random.randint(-10, 10) / 50
-	return Polygon(points, position, velocity, rotation, rotationRate, (0, 0, 0))
+	return Polygon(points, position, velocity, rotation, rotationRate, (215, 0, 0))
 
-def createParticle(polygons, position):
+def createParticle(polygons, position, color):
 	points = [
 		[-3, -3], [-3, 3],
 		[3, 3], [3, -3]
 	]
 	velocity = [random.randint(-10, 10) / 5, random.randint(-10, 10) / 5]
-	polygons.append(Polygon(points, position, velocity, 0, 0.1, (100, 100, 100)))
+	polygons.append(Polygon(points, position, velocity, 0, 0.1, color))
 
 def main():
 	pygame.init()
@@ -173,11 +173,21 @@ def main():
 	polygon = createPolygon(screenSize)
 	polygons = [polygon]
 
+	focus = 0.5
+
 	cutting = False
 	firstCut = []
 	secondCut = []
 
 	background = pygame.image.load("background.png")
+	focusBarOuterRect = [(0, screenSize[1] / 16),
+					(screenSize[0] / 16, screenSize[1] / 16), 
+					(screenSize[0] / 16, screenSize[1] - screenSize[1] / 16),
+					(0, screenSize[1] - screenSize[1] / 16)]
+	focusBarInnerRect = [[screenSize[0] / 80, screenSize[1] / 12],
+					[screenSize[0] / 20, screenSize[1] / 12], 
+					[screenSize[0] / 20, screenSize[1] - screenSize[1] / 12],
+					[screenSize[0] / 80, screenSize[1] - screenSize[1] / 12]]
 
 	while(running):
 		for event in pygame.event.get():
@@ -197,6 +207,12 @@ def main():
 		clock.tick(60)
 		screen.blit(background, [0, 0, screenSize[0], screenSize[1]])
 		
+		focusBarInnerHeight = focus * (screenSize[1] / 12) + (1 - focus) * (screenSize[1] - screenSize[1] / 12)
+		focusBarInnerRect[0][1] = focusBarInnerHeight
+		focusBarInnerRect[1][1] = focusBarInnerHeight
+		pygame.gfxdraw.filled_polygon(screen, focusBarOuterRect, (0, 0, 0, 155))
+		pygame.gfxdraw.filled_polygon(screen, focusBarInnerRect, (150, 150, 215))
+		
 		for i in range(len(polygons) - 1, -1, -1):
 			poly = polygons[i]
 			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
@@ -206,12 +222,15 @@ def main():
 			pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], 
 								secondCut[0], secondCut[1], [155, 0 ,0])
 			time = (0.1 + time) / 2
+			focus -= 0.002
+			createParticle(polygons, [random.randint(int(screenSize[0] / 80), int(screenSize[0] / 20)), focusBarInnerHeight], (150, 150, 215))
 		else:
 			time = (1 + time) / 2
 
 		if polygon.position[1] > screenSize[1]:
 			polygon = createPolygon(screenSize)
 			polygons = [polygon]
+			focus = 1
 
 		pygame.display.flip()
 
