@@ -183,7 +183,7 @@ def findAngles(points):
 	for index in range(len(points)):
 		a = np.array(points[index - 1])
 		b = np.array(points[index])
-		c = np.array(points[index + 1])
+		c = np.array(points[(index + 1) % len(points)])
 
 		ba = a - b
 		bc = c - b
@@ -194,8 +194,17 @@ def findAngles(points):
 
 	return angleList
 
+def findLengths(points):
+	lengthList = []
+	for index in range(len(points)):
+		a = np.array(points[index])
+		b = np.array(points[(index + 1) % len(points)])
+		length = np.linalg.norm(a-b)
+		lengthList.append(length)
+	return lengthList
+
 # compares 2 list of angles and scores based on differences
-def comparison(angleList1, angleList2):
+def angleScore(angleList1, angleList2):
 	if len(angleList1) > len(angleList2):
 		(big, small) = (angleList1, angleList2)
 	else:
@@ -203,14 +212,30 @@ def comparison(angleList1, angleList2):
 	scoreList = []
 
 	for i in range(len(big)):
-		sum = 0
+		add = 0
 		for j in range(len(small)):
-			sum += abs(small[j] - big[j])
-		scoreList.append(sum)
+			add += abs(small[j] - big[j])
+		scoreList.append(add)
 		big.insert(0, big.pop())
 	return min(scoreList)
 
+def lengthScore(lengthList1, lengthList2):
+	if len(lengthList1) > len(lengthList2):
+		(big, small) = (lengthList1, lengthList2)
+	else:
+		(big, small) = (lengthList2, lengthList1)
+	scoreList = []
+	scale = sum(big) / sum(small)
+	for i in range(len(big)):
+		add = 0
+		for j in range(len(small)):
+			add += abs(small[j] - big[j])
+		scoreList.append(add)
+		big.insert(0, big.pop())
+	return min(scoreList) / scale
 
+def comparison(alist1, alist2, llist1, llist2):
+	return (angleScore(alist1, alist2), lengthScore(llist1, llist2))
 
 def createParticle(polygons, position, color):
 	points = [
@@ -479,6 +504,7 @@ while(running):
 			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
 			poly.move(time)
 			if poly.position[1] > screenSize[1] * 1.25:
+				
 				polygons.pop(i)
 
 		if cutting:
@@ -489,7 +515,16 @@ while(running):
 		else:
 			time = (1 + time) / 2
 
+<<<<<<< HEAD
+		if polygon.position[1] > screenSize[1]:
+			angles1 = findAngles(poly.points)
+			angles2 = findAngles(target.points)
+			length1 = findLengths(poly.points)
+			length2 = findLengths(target.points)
+			print((comparison(angles1, angles2, length1, length2)))
+=======
 		if polygon.position[1] > screenSize[1] * 1.25:
+>>>>>>> 7a3ffa321baf42a45522a53cd0a530c7748a0fb8
 			polygon = createPolygon(screenSize)
 			polygons = [polygon] + polygons
 			focus = 0.5
