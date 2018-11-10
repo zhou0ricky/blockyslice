@@ -237,7 +237,7 @@ def angleScore(angleList1, angleList2):
 			add += abs(small[j] - big[j])
 		scoreList.append(add)
 		big.insert(0, big.pop())
-	return min(scoreList)
+	return int(min(scoreList) * 100 / len(angleList2))
 
 def lengthScore(lengthList1, lengthList2):
 	if len(lengthList1) > len(lengthList2):
@@ -245,17 +245,20 @@ def lengthScore(lengthList1, lengthList2):
 	else:
 		(big, small) = (lengthList2, lengthList1)
 	scoreList = []
-	scale = sum(big) / sum(small)
+	if sum(big) > sum(small):
+		scale = sum(big) / sum(small)
+	else:
+		scale = sum(small) / sum(big)
 	for i in range(len(big)):
 		add = 0
 		for j in range(len(small)):
 			add += abs(small[j] - big[j])
 		scoreList.append(add)
 		big.insert(0, big.pop())
-	return min(scoreList) / scale
+	return int(min(scoreList) / (scale * len(lengthList2)))
 
 def comparison(alist1, alist2, llist1, llist2):
-	return (angleScore(alist1, alist2), lengthScore(llist1, llist2))
+	return (angleScore(alist1, alist2) + lengthScore(llist1, llist2))
 
 def createParticle(polygons, position, color):
 	points = [
@@ -501,11 +504,17 @@ while(running):
 			angles2 = findAngles(target.points)
 			length1 = findLengths(poly.points)
 			length2 = findLengths(target.points)
-			print((comparison(angles1, angles2, length1, length2)))
+			score = (comparison(angles1, angles2, length1, length2))
+			if score < 30:
+				focus += 0.3
+			elif score < 40:
+				focus += 0
+			else:
+				focus -= 0.1
 			polygon = createPolygon(screenSize)
 			polygons = [polygon] + polygons
-			focus = 0.5
 			target = createTarget(screenSize)
+
 
 		screen.blit(targetText, targetTextRect)
 		pygame.gfxdraw.filled_polygon(screen, transformPoints(target.points, target.position, target.rotation), target.color)
