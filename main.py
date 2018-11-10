@@ -258,7 +258,6 @@ targetText = font.render("Target: ", True, (75, 75, 75))
 targetTextRect = targetText.get_rect().move(750, 30)
 target = createTarget(screenSize)
 
-<<<<<<< HEAD
 buttonBox = [-150, 50], [-150, -50], [150, -50], [150, 50]
 creativeBox = Polygon(buttonBox, [240, 300], [0, 0], 0, 0.3, (215, 0, 0))
 creativeBoxText = font.render("Creative", True, (75, 75, 75))
@@ -266,9 +265,6 @@ creativeBoxTextRect = creativeBoxText.get_rect().move(100, 265)
 polygons.append(creativeBox)
 
 #sound
-=======
-#Import sounds
->>>>>>> e97ad0b4d51e40f0ec2dde594ccfc2090f7fd50c
 gameSong = pygame.mixer.Sound("Speed Round Loop.wav")
 slashUp = pygame.mixer.Sound("UpSlash.wav")
 slashDown = pygame.mixer.Sound("Short Down Slash.wav")
