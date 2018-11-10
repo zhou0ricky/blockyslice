@@ -158,7 +158,7 @@ def createParticle(polygons, position):
 
 def main():
 	pygame.init()
-	screenSize = [800, 600]
+	screenSize = [1080, 760]
 
 	screen = pygame.display.set_mode(screenSize)
 	clock = pygame.time.Clock()
@@ -176,6 +176,8 @@ def main():
 	firstCut = []
 	secondCut = []
 
+	background = pygame.image.load("background.png")
+
 	while(running):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -192,7 +194,7 @@ def main():
 		secondCut = pygame.mouse.get_pos()
 
 		clock.tick(60)
-		screen.fill([255, 255, 255])
+		screen.blit(background, [0, 0, screenSize[0], screenSize[1]])
 		
 		for i in range(len(polygons) - 1, -1, -1):
 			poly = polygons[i]
@@ -201,7 +203,7 @@ def main():
 
 		if cutting:
 			pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], 
-								secondCut[0], secondCut[1], [0, 0 ,0])
+								secondCut[0], secondCut[1], [155, 0 ,0])
 			time = (0.1 + time) / 2
 		else:
 			time = (1 + time) / 2
