@@ -112,15 +112,17 @@ class Polygon(object):
 				half2.append(self.points[i % len(self.points)])
 			half1.append(intersectionPoints[1])
 			half2.append(intersectionPoints[0])
-			vel2 = copy.copy(self.velocity)
-			#self.velocity[0] += 0.5
-			#vel2[0] -= 0.5
+			velocity = [random.randint(-10, 10) / 0.25, random.randint(-10, 10) / 0.25]
 			if calculateArea(half1) > calculateArea(half2):
 				self.points = half1
-				polygons.append(Polygon(half2, copy.copy(self.position), vel2, self.rotation, self.rotationRate, (100, 100, 100)))
+				polygons.append(Polygon(half2, copy.copy(self.position), velocity, self.rotation, self.rotationRate, (100, 100, 100)))
 			else:
 				self.points = half2
-				polygons.append(Polygon(half1, copy.copy(self.position), vel2, self.rotation, self.rotationRate, (100, 100, 100)))
+				polygons.append(Polygon(half1, copy.copy(self.position), velocity, self.rotation, self.rotationRate, (100, 100, 100)))
+		for i in range(50):
+			posX = line[0][0] * (50 - i) / 50 + line[1][0] * i / 50
+			posY = line[0][1] * (50 - i) / 50 + line[1][1] * i / 50
+			createParticle(polygons, [posX, posY])
 
 	def move(self, time):
 		self.position[0] += self.velocity[0] * time
@@ -145,6 +147,14 @@ def createPolygon(screenSize):
 	rotation = 0.05
 	rotationRate = random.randint(-10, 10) / 50
 	return Polygon(points, position, velocity, rotation, rotationRate, (0, 0, 0))
+
+def createParticle(polygons, position):
+	points = [
+		[-3, -3], [-3, 3],
+		[3, 3], [3, -3]
+	]
+	velocity = [random.randint(-10, 10) / 5, random.randint(-10, 10) / 5]
+	polygons.append(Polygon(points, position, velocity, 0, 0.1, (100, 100, 100)))
 
 def main():
 	pygame.init()
@@ -184,7 +194,8 @@ def main():
 		clock.tick(60)
 		screen.fill([255, 255, 255])
 		
-		for poly in polygons:
+		for i in range(len(polygons) - 1, -1, -1):
+			poly = polygons[i]
 			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
 			poly.move(time)
 
