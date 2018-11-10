@@ -257,7 +257,7 @@ def createParticle(polygons, position, color):
 pygame.init()
 screenSize = [1080, 760]
 
-screen = pygame.display.set_mode(screenSize)
+screen = pygame.display.set_mode(screenSize, pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 font = pygame.font.Font("eggroll.ttf", 64)
 
@@ -273,7 +273,7 @@ time = 1
 polygon = createPolygon(screenSize)
 polygons = []
 
-focus = 0.5
+focus = 0
 
 cutting = False
 firstCut = []
@@ -288,10 +288,6 @@ focusBarOuterRect = [(0, screenSize[1] / 16),
 				(screenSize[0] / 16, screenSize[1] / 16), 
 				(screenSize[0] / 16, screenSize[1] - screenSize[1] / 16),
 				(0, screenSize[1] - screenSize[1] / 16)]
-focusBarInnerRect = [[screenSize[0] / 80, screenSize[1] / 12],
-				[screenSize[0] / 20, screenSize[1] / 12], 
-				[screenSize[0] / 20, screenSize[1] - screenSize[1] / 12],
-				[screenSize[0] / 80, screenSize[1] - screenSize[1] / 12]]
 targetText = font.render("Target: ", True, (75, 75, 75))
 targetTextRect = targetText.get_rect().move(750, 30)
 target = createTarget(screenSize)
@@ -303,8 +299,8 @@ great = font.render("Great", True, (150, 150, 215))
 ratings.append((great, great.get_rect()))
 alright = font.render("Alright", True, (150, 150, 215))
 ratings.append((alright, alright.get_rect()))
-bad = font.render("Bad", True, (150, 150, 215))
-ratings.append((bad, bad.get_rect()))
+dissapointing = font.render("Dissapointing", True, (150, 150, 215))
+ratings.append((dissapointing, dissapointing.get_rect()))
 abysmal = font.render("Abysmal!", True, (150, 150, 215))
 ratings.append((abysmal, abysmal.get_rect()))
 rating = (ratings[0], [0, screenSize[1]], 0)
@@ -431,6 +427,11 @@ while(running):
 				polygons.pop(i)
 
 		if len(polygons) == 0:
+			focusBarInnerRect = [[screenSize[0] / 80, screenSize[1] - screenSize[1] / 12],
+				[screenSize[0] / 20, screenSize[1] - screenSize[1] / 12], 
+				[screenSize[0] / 20, screenSize[1] - screenSize[1] / 12],
+				[screenSize[0] / 80, screenSize[1] - screenSize[1] / 12]]
+			focus = 1
 			mode = nextMode
 			polygon = createPolygon(screenSize)
 			polygons.append(polygon)
@@ -507,17 +508,18 @@ while(running):
 			if score < 30:
 				rat = 0
 				focus += 0.4
-			elif score < 35:
+			elif score < 40:
 				rat = 1
 				focus += 0.3
-			elif score < 40:
+			elif score < 50:
 				rat = 2
 				focus += 0.1
-			elif score < 45:
+			elif score < 60:
 				rat = 3
 				focus += 0
 			else:
 				focus -= 0.1
+			if focus > 1: focus = 1
 			rating = [ratings[rat], [400, screenSize[1]], -6]
 			polygon = createPolygon(screenSize)
 			polygons = [polygon] + polygons
@@ -594,10 +596,30 @@ while(running):
 
 		if polygon.position[1] > screenSize[1] * 1.25:
 			size = calculateArea(polygon.points)
-			focus += (5000 - size) * 0.00005
-			print(focus)
+			rat = 4
+			if size < 300:
+				rat = 0
+				focus += 0.4
+			elif size < 1000:
+				rat = 1
+				focus += 0.3
+			elif size < 2000:
+				rat = 2
+				focus += 0.1
+			elif size < 5000:
+				rat = 3
+				focus += 0
+			else:
+				focus -= 0.1
+			if focus > 1: focus = 1
+			rating = [ratings[rat], [400, screenSize[1]], -6]
 			polygon = createPolygon(screenSize)
 			polygons = [polygon] + polygons
+
+		if rating[1][1] < screenSize[1] or rating[2] < 0:
+			rating[1][1] += rating[2]
+			rating[2] += gravity
+			screen.blit(rating[0][0], rating[0][1].move(rating[1][0], rating[1][1]))
 
 	pygame.display.flip()
 
