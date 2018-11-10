@@ -1,6 +1,7 @@
 import pygame.gfxdraw
 import math
 import random
+import copy
 
 gravity = 0.1
 
@@ -58,22 +59,12 @@ def invertPoints(points, position, rotation):
 
 
 class Polygon(object):
-	def __init__(self, screenSize):
-		self.points = [
-			[-50, -50], [-50, 50],
-			[50, 50], [50, -50]
-		]
-
-		posX = random.randint(0, screenSize[0])
-		toTravel = screenSize[0] / 2 - posX
-		posY = screenSize[1]
-		velY = -10
-		velX = toTravel / (-velY / gravity)
-
-		self.position = [posX, posY]
-		self.velocity = [velX, velY]
-		self.rotationRate = random.randint(-10, 10) / 50
-		self.rotation = 0
+	def __init__(self, points, position, velocity, rotation, rotationRate):
+		self.points = points
+		self.position = position
+		self.velocity = velocity
+		self.rotation = rotation
+		self.rotationRate = rotationRate
 
 	def recenter(self):
 		center = [0, 0]
@@ -88,7 +79,7 @@ class Polygon(object):
 		self.position[0] -= center[0]
 		self.position[1] -= center[1]
 
-	def slice(self, line):
+	def slice(self, line, polygons):
 		newPoints = transformPoints(self.points, self.position, self.rotation)
 		intersectionPoints = []
 		intersectionEdgeNums = []
@@ -101,12 +92,17 @@ class Polygon(object):
 		if len(intersectionPoints) == 2:
 			intersectionPoints = invertPoints(intersectionPoints, self.position, self.rotation)
 			half1 = [intersectionPoints[0]]
-			for i in range(min(intersectionEdgeNums[0], intersectionEdgeNums[1]) + 1,
-						max(intersectionEdgeNums[0], intersectionEdgeNums[1]) + 1):
-				half1.append(self.points[i])
+			half2 = [intersectionPoints[1]]
+			for i in range(0, len(newPoints)):
+				if intersectionEdgeNums[0] < i and i <= intersectionEdgeNums[1]:
+					half1.append(self.points[i])
+				else:
+					half2.append(self.points[i])
 			half1.append(intersectionPoints[1])
+			half2.append(intersectionPoints[0])
 			self.points = half1
-			self.recenter()
+			smaller = Polygon(half2, copy.copy(self.position), copy.copy(self.velocity), self.rotation, self.rotationRate)
+			polygons.append(smaller)
 
 
 	def move(self, time):
@@ -114,6 +110,24 @@ class Polygon(object):
 		self.position[1] += self.velocity[1] * time
 		self.velocity[1] += gravity * time
 		self.rotation += self.rotationRate * time
+
+def createPolygon(screenSize):
+	points = [
+		[-50, -50], [-50, 50],
+		[50, 50], [50, -50]
+	]
+
+	posX = random.randint(0, screenSize[0])
+	toTravel = screenSize[0] / 2 - posX
+	posY = screenSize[1]
+	velY = -10
+	velX = toTravel / (-velY / gravity)
+
+	position = [posX, posY]
+	velocity = [velX, velY]
+	rotation = 0.05
+	rotationRate = random.randint(-10, 10) / 50
+	return Polygon(points, position, velocity, rotation, rotationRate)
 
 def main():
 	pygame.init()
@@ -128,7 +142,8 @@ def main():
 
 	time = 1
 
-	polygon = Polygon(screenSize)
+	polygon = createPolygon(screenSize)
+	polygons = [polygon]
 
 	cutting = False
 	firstCut = []
@@ -146,14 +161,16 @@ def main():
 				cutting = True
 			elif event.type == pygame.MOUSEBUTTONUP:
 				cutting = False
-				polygon.slice([firstCut, secondCut]);
+				polygon.slice([firstCut, secondCut], polygons);
 		secondCut = pygame.mouse.get_pos()
 
 		clock.tick(60)
 		screen.fill([255, 255, 255])
-
-		pygame.gfxdraw.filled_polygon(screen, transformPoints(polygon.points, polygon.position, polygon.rotation), [0, 0, 0])
 		
+		for poly in polygons:
+			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), [0, 0, 0])
+			poly.move(time)
+
 		if cutting:
 			pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], 
 								secondCut[0], secondCut[1], [0, 0 ,0])
@@ -161,15 +178,11 @@ def main():
 		else:
 			time = (1 + time) / 2
 
-
-		polygon.move(time)
-
 		if polygon.position[1] > screenSize[1]:
-			polygon = Polygon(screenSize)
+			polygon = createPolygon(screenSize)
+			polygons = [polygon]
 
 		pygame.display.flip()
-
-		#print(clock.get_fps())
 
 	pygame.quit()
 
