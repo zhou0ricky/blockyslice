@@ -258,7 +258,8 @@ font = pygame.font.Font("eggroll.ttf", 64)
 pygame.display.set_caption("Blocky Slice")
 
 running = True
-mode = 1
+mode = 0
+nextMode = 0
 
 time = 1
 
@@ -274,6 +275,8 @@ secondCut = []
 #graphics
 particlePos = -1
 background = pygame.image.load("background.png")
+go = pygame.image.load("GO!.png")
+splashTitle = pygame.image.load("Splash title (Textcraft).png")
 focusBarOuterRect = [(0, screenSize[1] / 16),
 				(screenSize[0] / 16, screenSize[1] / 16), 
 				(screenSize[0] / 16, screenSize[1] - screenSize[1] / 16),
@@ -287,10 +290,13 @@ targetTextRect = targetText.get_rect().move(750, 30)
 target = createTarget(screenSize)
 
 buttonBox = [-150, 50], [-150, -50], [150, -50], [150, 50]
-creativeBox = Polygon(buttonBox, [240, 300], [0, 0], 0, 0.3, (215, 0, 0))
+creativeBox = Polygon(buttonBox, [150, 300], [0, 0], 0, 0.3, (215, 0, 0))
 creativeBoxText = font.render("Creative", True, (75, 75, 75))
-creativeBoxTextRect = creativeBoxText.get_rect().move(100, 265)
-polygons.append(creativeBox)
+creativeBoxTextRect = creativeBoxText.get_rect().move(75, 265)
+survivalBox = Polygon(buttonBox, [150, 500], [0, 0], 0, 0.3, (215, 0, 0))
+survivalBoxText = font.render("Survival", True, (75, 75, 75))
+survivalBoxTextRect = survivalBoxText.get_rect().move(75, 465)
+polygons = [creativeBox, survivalBox]
 
 #sound
 gameSong = pygame.mixer.Sound("Speed Round Loop.wav")
@@ -307,10 +313,6 @@ creativeTheme = pygame.mixer.Sound("Tutorial.wav")
 # class Music(object):
 music = pygame.mixer.Channel(0)
 
-#Import pics
-go = pygame.image.load("GO!.png")
-splashTitle = pygame.image.load("Splash title (Textcraft).png")
-
 while(running):
 	clock.tick(60)
 
@@ -318,65 +320,6 @@ while(running):
 	#Splash Screen
 	####################################################################################################
 	if mode == 0:
-		if not pygame.mixer.get_busy():
-			music.play(splashIntro)	
-			music.queue(splashLoop)
-		if not music.get_sound() == splashIntro:
-			music.queue(splashLoop)
-
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				running = False
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_ESCAPE:
-					running = False
-			if event.type == pygame.MOUSEBUTTONDOWN:
-				firstCut = pygame.mouse.get_pos()
-				cutting = True
-			elif event.type == pygame.MOUSEBUTTONUP:
-				cutting = False
-				if creativeBox.slice([firstCut, secondCut], polygons):
-					creativeBox.rotationRate = -0.3
-					for poly in polygons:
-						poly.velocity = [-25, -0.4]
-					creativeBox.velocity = [25, -0.4]
-					mode = 2
-				particlePos = 0
-				if secondCut[1] > firstCut[1]:
-					slashDown.play()
-				else:
-					slashUp.play()
-		secondCut = pygame.mouse.get_pos()
-
-		clock.tick(60)
-		screen.blit(background, [0, 0, screenSize[0], screenSize[1]])
-		screen.blit(splashTitle, [screenSize[0] // 5, screenSize[1] // 4, screenSize[0], screenSize[1]])
-		screen.blit(go, [screenSize[0] // 3.25, screenSize[1] // 2.25, screenSize[0], screenSize[1]])
-
-		if cutting:
-			pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], 
-								secondCut[0], secondCut[1], [155, 0 ,0])
-			time = (0.1 + time) / 2
-			focus -= 0.002
-			createParticle(polygons, [random.randint(int(screenSize[0] / 80), int(screenSize[0] / 20))], (150, 150, 215))
-		else:
-			time = (1 + time) / 2
-
-		if polygon.position[1] > screenSize[1]:
-			polygon = createPolygon(screenSize)
-			polygons = [polygon] + polygons
-			focus = 0.5
-			target = createTarget(screenSize)
-
-		pygame.display.flip()
-
-
-
-
-	####################################################################################################
-	#Choose Gamemode
-	####################################################################################################
-	elif mode == 1:
 		if not pygame.mixer.get_busy():
 			music.play(splashIntro)	
 			music.queue(splashLoop)
@@ -394,11 +337,19 @@ while(running):
 				cutting = True
 			elif event.type == pygame.MOUSEBUTTONUP:
 				cutting = False
-				if creativeBox.slice([firstCut, secondCut], polygons):
+				cbs = creativeBox.slice([firstCut, secondCut], polygons)
+				sbs = survivalBox.slice([firstCut, secondCut], polygons)
+				if cbs or sbs:
 					creativeBox.rotationRate = -0.3
+					survivalBox.rotationRate = -0.3
 					for poly in polygons:
 						poly.velocity = [-25, -0.4]
 					creativeBox.velocity = [25, -0.4]
+					survivalBox.velocity = [20, -0.8]
+					if cbs:
+						nextMode = 3
+					else:
+						nextMode = 4
 					mode = 2
 				particlePos = 0
 				if secondCut[1] > firstCut[1]:
@@ -414,19 +365,23 @@ while(running):
 			pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
 
 		screen.blit(creativeBoxText, creativeBoxTextRect)
+		screen.blit(survivalBoxText, survivalBoxTextRect)
+		screen.blit(splashTitle, [200, 50, screenSize[0], screenSize[1]])
 
 		if cutting:
 			pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], secondCut[0], secondCut[1], [155, 0 ,0])
 
 	####################################################################################################
+	#Tutorial Mode
+	####################################################################################################
+	elif mode == 1:
+		pass
+
+	####################################################################################################
 	#Buffer Mode
 	####################################################################################################
 	elif mode == 2:
-		if not pygame.mixer.get_busy():
-			music.play(creativeTheme)
-		if music.get_sound() == creativeTheme:
-			music.queue(creativeTheme)
-
+		music.stop()
 
 			# pygame.mixer.music.queue(survivalTheme)
 
@@ -448,7 +403,7 @@ while(running):
 			if particlePos > 50: particlePos = -1
 
 		if len(polygons) == 0:
-			mode = 3
+			mode = nextMode
 			polygons.append(polygon)
 
 		for i in range(len(polygons) - 1, -1, -1):
@@ -463,6 +418,11 @@ while(running):
 	#Creative Mode
 	####################################################################################################
 	elif mode == 3:
+		if not pygame.mixer.get_busy():
+			music.play(creativeTheme)
+		if music.get_sound() == creativeTheme:
+			music.queue(creativeTheme)
+
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -528,7 +488,6 @@ while(running):
 				focus += 0
 			else:
 				focus -= 0.1
-
 			polygon = createPolygon(screenSize)
 			polygons = [polygon] + polygons
 			target = createTarget(screenSize)
@@ -547,11 +506,6 @@ while(running):
 		if music.get_sound() == survivalTheme:
 			music.queue(survivalTheme)
 
-	####################################################################################################
-	#Tutorial Mode
-	####################################################################################################
-	elif mode == 4:
-		pass
 	pygame.display.flip()
 
 print(clock.get_fps())
