@@ -174,6 +174,26 @@ def createPolygon(screenSize):
 	rotationRate = random.randint(-10, 10) / 50
 	return Polygon(points, position, velocity, rotation, rotationRate, (215, 0, 0))
 
+def createMultiplePolygon(screenSize, n):
+	polyList = []
+	for polygon in range(n):
+		points = [
+			[-50, -50], [-50, 50],
+			[50, 50], [50, -50]
+		]
+
+		posX = random.randint(0, screenSize[0])
+		toTravel = screenSize[0] / 2 - posX
+		posY = screenSize[1]
+		velY = -10
+		velX = toTravel / (-velY / gravity)
+
+		position = [posX, posY]
+		velocity = [velX, velY]
+		rotation = 0.05
+		rotationRate = random.randint(-10, 10) / 50
+		polyList.append(Polygon(points, position, velocity, rotation, rotationRate, (215, 0, 0)))
+	return polyList
 
 import numpy as np
 
@@ -255,7 +275,7 @@ font = pygame.font.Font("eggroll.ttf", 64)
 pygame.display.set_caption("Blocky Slice")
 
 running = True
-mode = 0
+mode = 1
 
 time = 1
 
@@ -379,7 +399,7 @@ while(running):
 			music.queue(splashLoop)
 		if music.get_sound() == splashLoop:
 			music.queue(splashLoop)
-		choose()
+		# choose()
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -420,7 +440,7 @@ while(running):
 	#Buffer Mode
 	####################################################################################################
 	elif mode == 2:
-		music.stop()
+		music.fadeout(500)
 
 			# pygame.mixer.music.queue(survivalTheme)
 
@@ -515,16 +535,16 @@ while(running):
 		else:
 			time = (1 + time) / 2
 
-<<<<<<< HEAD
+
 		if polygon.position[1] > screenSize[1]:
 			angles1 = findAngles(poly.points)
 			angles2 = findAngles(target.points)
 			length1 = findLengths(poly.points)
 			length2 = findLengths(target.points)
 			print((comparison(angles1, angles2, length1, length2)))
-=======
+
 		if polygon.position[1] > screenSize[1] * 1.25:
->>>>>>> 7a3ffa321baf42a45522a53cd0a530c7748a0fb8
+
 			polygon = createPolygon(screenSize)
 			polygons = [polygon] + polygons
 			focus = 0.5
@@ -536,12 +556,88 @@ while(running):
 	####################################################################################################
 	#Survival Mode
 	####################################################################################################
-	elif mode == 3:
+	elif mode == 4:
 		if not pygame.mixer.get_busy():
 			music.play(survivalIntro)
 			music.queue(survivalTheme)
 		if music.get_sound() == survivalTheme:
 			music.queue(survivalTheme)
+
+		newPolyCount = random.randint(1, 4)
+		polyList = createMultiplePolygon(screenSize, newPolyCount)
+
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				running = False
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_ESCAPE:
+					running = False
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				firstCut = pygame.mouse.get_pos()
+				cutting = True
+			elif event.type == pygame.MOUSEBUTTONUP:
+				cutting = False
+				for polygon in polyList:
+					polygon.slice([firstCut, secondCut], polygons)
+				particlePos = 0
+				if secondCut[1] > firstCut[1]:
+					slashDown.play()
+				else:
+					slashUp.play()
+		secondCut = pygame.mouse.get_pos()
+
+		screen.blit(background, [0, 0, screenSize[0], screenSize[1]])
+		
+		focusBarTargetInnerHeight = focus * (screenSize[1] / 12) + (1 - focus) * (screenSize[1] - screenSize[1] / 12)
+		focusBarInnerHeight = (focusBarTargetInnerHeight + focusBarInnerRect[0][1] * 7) / 8
+		focusBarInnerRect[0][1] = focusBarInnerHeight
+		focusBarInnerRect[1][1] = focusBarInnerHeight
+		pygame.gfxdraw.filled_polygon(screen, focusBarOuterRect, (0, 0, 0, 155))
+		pygame.gfxdraw.filled_polygon(screen, focusBarInnerRect, (150, 150, 215))
+		
+		if particlePos != -1:
+			for i in range(particlePos, particlePos + 25):
+				posX = firstCut[0] * (50 - i) / 50 + secondCut[0] * i / 50
+				posY = firstCut[1] * (50 - i) / 50 + secondCut[1] * i / 50
+				createParticle(polygons, [posX, posY], (155, 100, 100))
+			particlePos += 25
+			if particlePos > 50: particlePos = -1
+
+		for polygon in polyList:
+			for i in range(len(polygons) - 1, -1, -1):
+				poly = polygons[i]
+				pygame.gfxdraw.filled_polygon(screen, transformPoints(poly.points, poly.position, poly.rotation), poly.color)
+				poly.move(time)
+				if poly.position[1] > screenSize[1] * 1.25:
+
+					polygons.pop(i)
+
+		if cutting:
+			pygame.gfxdraw.line(screen, firstCut[0], firstCut[1], secondCut[0], secondCut[1], [155, 0 ,0])
+			time = (0.1 + time) / 2
+			focus -= 0.002
+			createParticle(polygons, [random.randint(int(screenSize[0] / 80), int(screenSize[0] / 20)), focusBarInnerHeight], (150, 150, 215))
+		else:
+			time = (1 + time) / 2
+
+
+		if polygon.position[1] > screenSize[1]:
+			angles1 = findAngles(poly.points)
+			angles2 = findAngles(target.points)
+			length1 = findLengths(poly.points)
+			length2 = findLengths(target.points)
+			print((comparison(angles1, angles2, length1, length2)))
+
+		if polygon.position[1] > screenSize[1] * 1.25:
+
+			polygon = createPolygon(screenSize)
+			polygons = [polygon] + polygons
+			focus = 0.5
+			target = createTarget(screenSize)
+
+		screen.blit(targetText, targetTextRect)
+		pygame.gfxdraw.filled_polygon(screen, transformPoints(target.points, target.position, target.rotation), target.color)
+
 
 	####################################################################################################
 	#Tutorial Mode
