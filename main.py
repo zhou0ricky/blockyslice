@@ -395,11 +395,7 @@ while(running):
 	#Buffer Mode
 	####################################################################################################
 	elif mode == 2:
-		if not pygame.mixer.get_busy():
-			music.play(creativeTheme)
-		if music.get_sound() == creativeTheme:
-			music.queue(creativeTheme)
-
+		music.stop()
 
 			# pygame.mixer.music.queue(survivalTheme)
 
@@ -436,6 +432,11 @@ while(running):
 	#Creative Mode
 	####################################################################################################
 	elif mode == 3:
+		if not pygame.mixer.get_busy():
+			music.play(creativeTheme)
+		if music.get_sound() == creativeTheme:
+			music.queue(creativeTheme)
+
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
