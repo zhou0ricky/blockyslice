@@ -241,8 +241,10 @@ while(running):
 	#Splash Screen
 	####################################################################################################
 	if mode == 0:
-		if not pygame.mixer.get_busy:
+		if not pygame.mixer.get_busy():
 			music.play(splashIntro)	
+			music.queue(splashLoop)
+		if music.get_sound() == splashLoop:
 			music.queue(splashLoop)
 		splash()
 
@@ -250,6 +252,11 @@ while(running):
 	#Choose Gamemode
 	####################################################################################################
 	elif mode == 1:
+		if not pygame.mixer.get_busy():
+			music.play(splashIntro)	
+			music.queue(splashLoop)
+		if music.get_sound() == splashLoop:
+			music.queue(splashLoop)
 		choose()
 
 	####################################################################################################
@@ -257,10 +264,9 @@ while(running):
 	####################################################################################################
 	elif mode == 2:
 		if not pygame.mixer.get_busy():
-			music.play(survivalIntro)
-			music.queue(survivalTheme)
-		if music.get_sound() == survivalTheme:
-			music.queue(survivalTheme)
+			music.play(creativeTheme)
+		if music.get_sound() == creativeTheme:
+			music.queue(creativeTheme)
 
 
 			# pygame.mixer.music.queue(survivalTheme)
@@ -324,7 +330,11 @@ while(running):
 	#Survival Mode
 	####################################################################################################
 	elif mode == 3:
-		survival()
+		if not pygame.mixer.get_busy():
+			music.play(survivalIntro)
+			music.queue(survivalTheme)
+		if music.get_sound() == survivalTheme:
+			music.queue(survivalTheme)
 
 print(clock.get_fps())
 pygame.quit()
